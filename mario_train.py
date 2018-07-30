@@ -138,7 +138,7 @@ class Train:
 
         try:
 
-            for i_episode in tqdm(range(1000)):
+            for i_episode in tqdm(range(50000)):
                 _total_reward = 0
                 self._env.reset()
 
