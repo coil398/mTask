@@ -34,17 +34,9 @@ class Train:
         if os.path.exists('mario.npy'):
             self._q_table = np.load('mario.npy')
         else:
-            self._q_table = np.zeros((10000, 200, len(self._movement)))
-            # self._q_table = np.zeros((10000, 200, 256))
+            self._q_table = np.zeros((10000, len(self._movement)))
 
-        # for i in range(10000):
-        #     for j in range(200):
-        #         for k in range(len(self._movement)):
-        #             print(self._q_table[i][j][k])
-
-        print('shape: ', self._q_table.shape)
-
-        self._epsilon = 0.002
+        self._epsilon = 0.02
         self._alpha = 0.2 # learning rate.
         self._gamma = 0.99 # time discount rate.
 
@@ -65,7 +57,8 @@ class Train:
         if np.random.uniform(0, 1) > self._epsilon:
             _x_position = self._x_position
             _y_position = self._y_position
-            _action = np.argmax(self._q_table[_x_position][_y_position])
+            _action = np.argmax(self._q_table[_x_position])
+            # _action = np.argmax(self._q_table[_x_position][_y_position])
         else:
             _action = np.random.random_integers(1, len(self._movement)-1)
         # print('action: ', _action)
@@ -78,7 +71,6 @@ class Train:
     def _get_x_reward(self):
         _x_position = self._env._get_x_position()
         _reward = _x_position - self._x_position
-        # print('x reward: ', _reward)
         if _reward < -5 or _reward > 5:
             return 0
         elif _reward == 0:
@@ -111,22 +103,25 @@ class Train:
         return 0
 
     def _get_reward(self):
-        _reward =  self._get_x_reward() + self._get_y_reward() + self._get_x_y_reward() + self._get_time_reward() + self._get_death_reward()
+        _reward =  self._get_x_reward() + self._get_x_y_reward() + self._get_time_reward() + self._get_death_reward()
         return _reward
 
     def _update_q_table(self, _action):
         _x_position = self._env._get_x_position()
         _y_position = self._env._get_y_position()
 
-        _next_max_q_value = max(self._q_table[_x_position][_y_position])
-        _q_value = self._q_table[self._x_position][self._y_position][_action]
+        _next_max_q_value = max(self._q_table[_x_position])
+        # _next_max_q_value = max(self._q_table[_x_position][_y_position])
+        _q_value = self._q_table[self._x_position][_action]
+        # _q_value = self._q_table[self._x_position][self._y_position][_action]
 
         _new_q_value = _q_value + self._alpha * (self._get_reward() + self._gamma * _next_max_q_value - _q_value)
 
         # print('q_value: ', _q_value)
         # print('new_q_value: ', _new_q_value)
 
-        self._q_table[self._x_position][self._y_position][_action] = _new_q_value
+        self._q_table[self._x_position][_action] = _new_q_value
+        # self._q_table[self._x_position][self._y_position][_action] = _new_q_value
 
     def _finalize(self):
         np.save('mario.npy', self._q_table)
