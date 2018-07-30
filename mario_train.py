@@ -80,14 +80,20 @@ class Train:
     def _get_y_reward(self):
         _y_position = self._env._get_y_position()
         _reward = _y_position - self._y_position
-        return _reward
+        if _reward > 0:
+            return _reward
+        else:
+            return 0
 
     def _get_x_y_reward(self):
         _y_position = self._env._get_y_position()
         _reward = _y_position - self._y_position
         if _reward < 0:
             return 0
-        return _reward
+        elif self._get_x_reward() > 0:
+            return _reward
+        else:
+            return 0
 
     def _get_time_reward(self):
         _time_left = self._env._get_time()
@@ -103,7 +109,7 @@ class Train:
         return 0
 
     def _get_reward(self):
-        _reward =  self._get_x_reward() + self._get_x_y_reward() + self._get_time_reward() + self._get_death_reward()
+        _reward =  self._get_x_reward() + self._get_y_reward() + self._get_time_reward() + self._get_death_reward()
         return _reward
 
     def _update_q_table(self, _action):
