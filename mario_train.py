@@ -36,7 +36,7 @@ class Train:
         else:
             self._q_table = np.zeros((10000, len(self._movement)))
 
-        self._epsilon = 0.02
+        self._epsilon = 0.002
         self._alpha = 0.2 # learning rate.
         self._gamma = 0.99 # time discount rate.
 
