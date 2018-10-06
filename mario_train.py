@@ -34,7 +34,7 @@ class Train:
         if os.path.exists('mario.npy'):
             self._q_table = np.load('mario.npy')
         else:
-            self._q_table = np.zeros((10000, len(self._movement)))
+            self._q_table = np.zeros((10000,100, len(self._movement)))
 
         self._epsilon = 0.002
         self._alpha = 0.2 # learning rate.
