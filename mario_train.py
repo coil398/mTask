@@ -34,7 +34,7 @@ class Train:
         if os.path.exists('mario.npy'):
             self._q_table = np.load('mario.npy')
         else:
-            self._q_table = np.zeros((10000,100, len(self._movement)))
+            self._q_table = np.zeros((10000,200, len(self._movement)))
 
         self._epsilon = 0.002
         self._alpha = 0.2 # learning rate.
@@ -57,7 +57,7 @@ class Train:
         if np.random.uniform(0, 1) > self._epsilon:
             _x_position = self._x_position
             _y_position = self._y_position
-            _action = np.argmax(self._q_table[_x_position])
+            _action = np.argmax(self._q_table[_x_position][_y_position])
             # _action = np.argmax(self._q_table[_x_position][_y_position])
         else:
             _action = np.random.random_integers(1, len(self._movement)-1)
@@ -109,16 +109,16 @@ class Train:
         return 0
 
     def _get_reward(self):
-        _reward =  self._get_x_reward() + self._get_y_reward() + self._get_time_reward() + self._get_death_reward()
+        _reward =  self._get_x_reward() + self._get_x_y_reward() + self._get_time_reward() + self._get_death_reward()
         return _reward
 
     def _update_q_table(self, _action):
         _x_position = self._env._get_x_position()
         _y_position = self._env._get_y_position()
 
-        _next_max_q_value = max(self._q_table[_x_position])
+        _next_max_q_value = max(self._q_table[_x_position][_y_position])
         # _next_max_q_value = max(self._q_table[_x_position][_y_position])
-        _q_value = self._q_table[self._x_position][_action]
+        _q_value = self._q_table[self._x_position][_y_position][_action]
         # _q_value = self._q_table[self._x_position][self._y_position][_action]
 
         _new_q_value = _q_value + self._alpha * (self._get_reward() + self._gamma * _next_max_q_value - _q_value)
@@ -126,7 +126,7 @@ class Train:
         # print('q_value: ', _q_value)
         # print('new_q_value: ', _new_q_value)
 
-        self._q_table[self._x_position][_action] = _new_q_value
+        self._q_table[self._x_position][self._y_position][_action] = _new_q_value
         # self._q_table[self._x_position][self._y_position][_action] = _new_q_value
 
     def _finalize(self):
